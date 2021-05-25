@@ -16,12 +16,16 @@ def gen_signal(n, W_max, N):
 
 def gen_time(n, W_max, N):
     time = []
+    Dx = []
+    Mx = []
     for i in range(N):
         start_time = t.time()
-        gen_signal(n, W_max, i)
+        data = gen_signal(n, W_max, i)
         end_time = t.time()
+        Mx.append(math_expectation(data))
+        Dx.append(dispersion(data))
         time.append(end_time - start_time)
-    return time
+    return [time, Mx, Dx]
 
 def math_expectation(data):
     return np.mean(data)
@@ -37,18 +41,19 @@ def autocorrelation(data):
     result = np.correlate(data, data, mode='full')
     return result[result.size // 2:]
 
+
 n = int(input("Numbers of garmonics = "))
 W_max = int(input("Border frequency = "))
 N = int(input("Number of points = "))
 I = int(input("Iterations(for time) = "))
 signal1 = gen_signal(n, W_max, N)
 signal2 = gen_signal(n, W_max, N)
-time = gen_time(n, W_max, I)
+data = gen_time(n, W_max, I)
 plt.figure(1)
 plt.plot(signal1)
 plt.title('Random signals graph')
 plt.figure(2)
-plt.plot(time)
+plt.plot(data[0])
 plt.title('Dependence of time graph')
 plt.figure(3)
 plt.plot(crosscorrelation(signal1, signal2))
@@ -56,6 +61,9 @@ plt.title('Crosscorrelation graph')
 plt.figure(4)
 plt.plot(autocorrelation(signal1))
 plt.title('Autocorrelation graph')
+plt.figure(5)
+plt.plot(data[1], data[2])
+plt.title('Mx from Dx')
 plt.show()
 print("Mathematical expectation = " + str(math_expectation(signal1)))
 print("Dispersion = " + str(dispersion(signal1)))
